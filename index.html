@@ -1,0 +1,171 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Glosario para Intérpretes EN-ES</title>
+    <style>
+        :root {
+            --bg: #f4f4f9;
+            --card: #ffffff;
+            --text: #222222;
+            --border: #dddddd;
+            --accent: #0066cc;
+        }
+        body.dark {
+            --bg: #121212;
+            --card: #1e1e1e;
+            --text: #e0e0e0;
+            --border: #333333;
+            --accent: #4da3ff;
+        }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+            background-color: var(--bg);
+            color: var(--text);
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+            transition: background 0.2s, color 0.2s;
+        }
+        header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+        button {
+            padding: 8px 14px;
+            cursor: pointer;
+            border: 1px solid var(--border);
+            background: var(--card);
+            color: var(--text);
+            border-radius: 6px;
+            font-size: 14px;
+        }
+        button.active {
+            background: var(--accent);
+            color: white;
+            border-color: var(--accent);
+        }
+        #buscador {
+            width: 100%;
+            padding: 15px;
+            font-size: 18px;
+            border: 2px solid var(--accent);
+            border-radius: 8px;
+            background: var(--card);
+            color: var(--text);
+            box-sizing: border-box;
+            margin-bottom: 15px;
+        }
+        .filtros {
+            display: flex;
+            gap: 8px;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+        }
+        .tarjeta {
+            background: var(--card);
+            border: 1px solid var(--border);
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 10px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .terminos {
+            font-size: 18px;
+        }
+        .en { font-weight: bold; color: var(--accent); }
+        .es { font-weight: bold; }
+        .categoria {
+            font-size: 12px;
+            padding: 4px 8px;
+            border-radius: 4px;
+            background: var(--bg);
+            border: 1px solid var(--border);
+        }
+    </style>
+</head>
+<body class="dark"> <!-- Inicia en modo oscuro ideal para cabina -->
+
+    <header>
+        <h2>🎙️ Glosario Rápido EN ↔ ES</h2>
+        <button onclick="document.body.classList.toggle('dark')">🌓 Modo Día/Noche</button>
+    </header>
+
+    <input type="text" id="buscador" placeholder="Escribe en inglés o español... (Pulsa ESC para limpiar)" autofocus>
+
+    <div class="filtros">
+        <button class="active" onclick="filtrarCategoria('Todos', this)">Todos</button>
+        <button onclick="filtrarCategoria('Médico', this)">Médico</button>
+        <button onclick="filtrarCategoria('Legal', this)">Legal</button>
+        <button onclick="filtrarCategoria('Finanzas', this)">Finanzas</button>
+    </div>
+
+    <div id="resultados"></div>
+
+    <script>
+        // AQUÍ AGREGAS TUS TÉRMINOS (Puedes añadir miles)
+        const glosario = [
+            { en: "Affidavit", es: "Declaración jurada", cat: "Legal" },
+            { en: "Subpoena", es: "Citación judicial / Comparendo", cat: "Legal" },
+            { en: "Shortness of breath", es: "Falta de aire / Disnea", cat: "Médico" },
+            { en: "Outpatient", es: "Paciente ambulatorio", cat: "Médico" },
+            { en: "Gross domestic product (GDP)", es: "Producto interno bruto (PIB)", cat: "Finanzas" },
+            { en: "Collateral", es: "Garantía / Aval", cat: "Finanzas" }
+        ];
+
+        let categoriaActual = 'Todos';
+        const input = document.getElementById('buscador');
+        const contenedor = document.getElementById('resultados');
+
+        function mostrarResultados() {
+            const texto = input.value.toLowerCase().trim();
+            contenedor.innerHTML = '';
+
+            const filtrados = glosario.filter(item => {
+                const coincideCat = categoriaActual === 'Todos' || item.cat === categoriaActual;
+                const coincideTexto = item.en.toLowerCase().includes(texto) || item.es.toLowerCase().includes(texto);
+                return coincideCat && coincideTexto;
+            });
+
+            filtrados.forEach(item => {
+                contenedor.innerHTML += `
+                    <div class="tarjeta">
+                        <div class="terminos">
+                            <span class="en">${item.en}</span> &nbsp;➔&nbsp; <span class="es">${item.es}</span>
+                        </div>
+                        <span class="categoria">${item.cat}</span>
+                    </div>
+                `;
+            });
+        }
+
+        function filtrarCategoria(cat, boton) {
+            categoriaActual = cat;
+            document.querySelectorAll('.filtros button').forEach(b => b.classList.remove('active'));
+            boton.classList.add('active');
+            mostrarResultados();
+            input.focus();
+        }
+
+        // Buscar al escribir
+        input.addEventListener('input', mostrarResultados);
+
+        // Limpiar rápido con la tecla Escape
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'Escape') {
+                input.value = '';
+                mostrarResultados();
+                input.focus();
+            }
+        });
+
+        // Cargar lista inicial
+        mostrarResultados();
+    </script>
+</body>
+</html>
